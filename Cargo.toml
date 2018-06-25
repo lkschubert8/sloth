@@ -1,0 +1,6 @@
+[package]
+name = "sloth"
+version = "0.1.0"
+authors = ["Luke Schubert <lkschubert8@gmail.com>"]
+
+[dependencies]
