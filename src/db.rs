@@ -1,3 +1,15 @@
+pub struct Db {
+    pub node_definitons: Vec<NodeDefinition>,
+    pub relationship_definitions : Vec<RelationshipDefinition>,
+}
+
+impl Db {
+    fn add_node(&mut self, newNode : NodeDefinition) -> () {
+        self.node_definitons.push(newNode)
+    }
+}
+
+
 #[derive(Debug)]
 pub enum Directionality {
     OneWay,
@@ -38,9 +50,3 @@ pub struct NodeDefinition {
     pub fields: Vec<NodeFieldDefinition>
 }
 
-
-
-pub struct Db {
-    pub node_definitons: Vec<NodeDefinition>,
-    pub relationship_definitions : Vec<RelationshipDefinition>,
-}
