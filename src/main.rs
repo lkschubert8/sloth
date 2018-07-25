@@ -1,6 +1,6 @@
-pub mod types;
+pub mod db;
 use std::collections::HashMap;
-use types::relationships;
+use db::relationships;
 
 fn main() {
     let relationships: HashMap<String, relationships::RelationshipDefinition> = HashMap::new();
@@ -24,7 +24,8 @@ fn main() {
     let relation = relationships::RelationshipDefinition {
         connections: vec![p2p_connection],
         name: String::from("Friend"),
-        directionality: types::relationships::Directionality::OneWay,
+        directionality: relationships::Directionality::OneWay,
+        fields: Vec::new(),
     };
 
     println!("{:?}", relation);

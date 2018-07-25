@@ -3,4 +3,9 @@ name = "sloth"
 version = "0.1.0"
 authors = ["Luke Schubert <lkschubert8@gmail.com>"]
 
+[build-dependencies]
+lalrpop ="0.15.2"
+
 [dependencies]
+lalrpop = "0.15.2"
+regex = "0.2.1"
