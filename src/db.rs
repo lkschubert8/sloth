@@ -8,42 +8,42 @@ pub struct Db {
 
 impl Db {
     fn add_node_definition(&mut self, new_node_definition: NodeDefinition) -> () {
-        self.node_definitions.insert(new_node_definition.name ,new_node_definition);
+        self.node_definitions.insert(new_node_definition.name.clone(), new_node_definition);
     }
 
     fn remove_node_definition(&mut self, node_definition_name: String) -> () {
-        unimplemented!();
+        self.node_definitions.remove(&node_definition_name);
     }
 
     fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition) -> () {
-        self.relationship_definitions.insert(new_relationship_definition.name, new_relationship_definition);
+        self.relationship_definitions.insert(new_relationship_definition.name.clone(), new_relationship_definition);
     }
 
-    fn remove_relationship_definition(&mut self, relationship_defintion_name: String) -> () {
-        unimplemented!();
+    fn remove_relationship_definition(&mut self, relationship_definition_name: String) -> () {
+        self.relationship_definitions.remove(&relationship_definition_name);
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug)]
 pub enum Directionality {
     OneWay,
     TwoWay,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug)]
 pub struct Connection {
     pub reversible: bool,
     pub left_type: NodeDefinition,
     pub right_type: NodeDefinition,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug)]
 pub struct RelationshipFieldDefinition {
     pub name: String,
     pub field_type: String,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug)]
 pub struct RelationshipDefinition {
     pub name: String,
     pub directionality: Directionality,
@@ -51,13 +51,13 @@ pub struct RelationshipDefinition {
     pub fields: Vec<RelationshipFieldDefinition>,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug)]
 pub struct NodeFieldDefinition {
     pub name: String,
     pub field_type: String,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug)]
 pub struct NodeDefinition {
     pub name: String,
     pub fields: Vec<NodeFieldDefinition>,
@@ -93,7 +93,7 @@ mod tests {
             fields: Vec::new(),
         };
         let mut node_definitions = HashMap::new();
-        node_definitions.insert(new_node_definition, new_node_definition);
+        node_definitions.insert(String::from("Test Node Name"), new_node_definition);
 
         let mut test_db = Db {
             node_definitions: node_definitions,
@@ -110,8 +110,8 @@ mod tests {
     #[test]
     fn test_add_relationship_defintion(){
         let mut test_db = Db {
-            node_definitions: Vec::new(),
-            relationship_definitions: Vec::new(),
+            node_definitions: HashMap::new(),
+            relationship_definitions: HashMap::new(),
             nodes: Vec::new(),
         };
         let new_relationship_definition = RelationshipDefinition {
@@ -135,11 +135,11 @@ mod tests {
             connections: Vec::new(),
             fields: Vec::new(),
         };
-        let mut node_relationships = Vec::new();
-        node_relationships.push(new_relationship_definition);
+        let mut node_relationships = HashMap::new();
+        node_relationships.insert(String::from("Test Relationship Name"), new_relationship_definition);
 
         let mut test_db = Db {
-            node_definitions: Vec::new(),
+            node_definitions: HashMap::new(),
             relationship_definitions: node_relationships,
             nodes: Vec::new(),
         };
