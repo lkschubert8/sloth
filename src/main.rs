@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_yaml;
+
+
 pub mod db;
 use std::collections::HashMap;
 
@@ -27,5 +32,8 @@ fn main() {
         fields: Vec::new(),
     };
 
-    println!("{:?}", relation);
+    let t = db::NodeFieldDefinition {
+        name: String::from("Test"),
+        field_type: db::FieldType::String
+    };
 }

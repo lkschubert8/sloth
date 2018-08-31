@@ -1,0 +1,10 @@
+---
+node_definitions:
+  Test Node Name:
+    name: Test Node Name
+    fields: []
+  Second Test Node Type:
+    name: Second Test Node Type
+    fields: []
+relationship_definitions: {}
+nodes: []
