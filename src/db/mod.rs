@@ -14,14 +14,14 @@ use self::relationship_definition::*;
 pub mod field_type;
 use self::field_type::FieldType;
 
-//#[derive(Serialize, Deserialize)]
-pub struct Db<'a> {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Db {
     pub node_definitions: HashMap<String, NodeDefinition>,
-    pub relationship_definitions: HashMap<String, RelationshipDefinition<'a>>,
+    pub relationship_definitions: HashMap<String, RelationshipDefinition>,
 }
 
-impl<'a> Db<'a> {
-    fn default () -> Db<'a> {
+impl Db {
+    fn default () -> Db {
         return Db {
             node_definitions: HashMap::new(),
             relationship_definitions: HashMap::new(),
@@ -29,11 +29,10 @@ impl<'a> Db<'a> {
     }
 
     fn load_schema_definition(filename: &str) -> Db {
-        unimplemented!();
-        // let mut file = File::open(filename).unwrap();
-        // let mut contents = String::new();
-        // file.read_to_string(&mut contents);
-        // return serde_yaml::from_str(contents.as_str()).unwrap();
+        let mut file = File::open(filename).unwrap();
+        let mut contents = String::new();
+        file.read_to_string(&mut contents);
+        return serde_yaml::from_str(contents.as_str()).unwrap();
     }
 
     fn add_node_definition(&mut self, new_node_definition: NodeDefinition) -> () {
@@ -44,7 +43,7 @@ impl<'a> Db<'a> {
         self.node_definitions.remove(&node_definition_name);
     }
 
-    fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition<'a>) -> () {
+    fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition) -> () {
         self.relationship_definitions.insert(new_relationship_definition.name.clone(), new_relationship_definition);
     }
 
@@ -53,9 +52,8 @@ impl<'a> Db<'a> {
     }
 
     fn save_schema_definition(&mut self, filename: &str) -> () {
-        unimplemented!();
-        // let mut file = File::create(filename).unwrap();
-        // file.write_all(serde_yaml::to_string(&self).unwrap().as_bytes());
+        let mut file = File::create(filename).unwrap();
+        file.write_all(serde_yaml::to_string(&self).unwrap().as_bytes());
     }
 
     

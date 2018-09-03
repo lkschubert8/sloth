@@ -1,4 +1,4 @@
-#[derive(Debug)]//#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum FieldType {
     String,
     Integer,
