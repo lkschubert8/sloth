@@ -26,3 +26,7 @@ pub struct RelationshipFieldDefinition {
     pub name: String,
     pub field_type: FieldType,
 }
+
+pub struct Relationship {
+    id: u64,
+}

@@ -1,18 +1,17 @@
+use serde_yaml;
 use std::fs::File;
 use std::io::prelude::*;
-use serde_yaml;
 
 use std::collections::HashMap;
 
 pub mod node_definition;
-use self::node_definition::NodeDefinition;
-use self::node_definition::NodeFieldDefinition;
+use self::node_definition::*;
 
 pub mod relationship_definition;
 use self::relationship_definition::*;
 
 pub mod field_type;
-use self::field_type::FieldType;
+use self::field_type::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Db {
@@ -21,11 +20,11 @@ pub struct Db {
 }
 
 impl Db {
-    fn default () -> Db {
+    fn default() -> Db {
         return Db {
             node_definitions: HashMap::new(),
             relationship_definitions: HashMap::new(),
-        }
+        };
     }
 
     fn load_schema_definition(filename: &str) -> Db {
@@ -36,19 +35,27 @@ impl Db {
     }
 
     fn add_node_definition(&mut self, new_node_definition: NodeDefinition) -> () {
-        self.node_definitions.insert(new_node_definition.name.clone(), new_node_definition);
+        self.node_definitions
+            .insert(new_node_definition.name.clone(), new_node_definition);
     }
 
     fn remove_node_definition(&mut self, node_definition_name: String) -> () {
         self.node_definitions.remove(&node_definition_name);
     }
 
-    fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition) -> () {
-        self.relationship_definitions.insert(new_relationship_definition.name.clone(), new_relationship_definition);
+    fn add_relationship_definition(
+        &mut self,
+        new_relationship_definition: RelationshipDefinition,
+    ) -> () {
+        self.relationship_definitions.insert(
+            new_relationship_definition.name.clone(),
+            new_relationship_definition,
+        );
     }
 
     fn remove_relationship_definition(&mut self, relationship_definition_name: String) -> () {
-        self.relationship_definitions.remove(&relationship_definition_name);
+        self.relationship_definitions
+            .remove(&relationship_definition_name);
     }
 
     fn save_schema_definition(&mut self, filename: &str) -> () {
@@ -56,9 +63,14 @@ impl Db {
         file.write_all(serde_yaml::to_string(&self).unwrap().as_bytes());
     }
 
-    
-}
+    fn add_node(&mut self, new_node: Node) -> u64 {
+        unimplemented!();
+    }
 
+    fn remove_node(&mut self, node_id: u64) -> () {
+        unimplemented!();
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -83,14 +95,12 @@ mod tests {
             "Failed to add node definition"
         );
 
-       
         test_db.add_node_definition(new_node_definition2);
 
         assert!(
             test_db.node_definitions.len() == 1,
             "Created duplicate node definition"
         );
-
     }
 
     #[test]
@@ -114,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_relationship_defintion(){
+    fn test_add_relationship_defintion() {
         let mut test_db = Db {
             node_definitions: HashMap::new(),
             relationship_definitions: HashMap::new(),
@@ -137,7 +147,7 @@ mod tests {
             fields: Vec::new(),
         };
         test_db.add_relationship_definition(new_relationship_definition2);
-         assert!(
+        assert!(
             test_db.relationship_definitions.len() == 1,
             "Created duplicate relationship definition"
         );
@@ -152,7 +162,10 @@ mod tests {
             fields: Vec::new(),
         };
         let mut node_relationships = HashMap::new();
-        node_relationships.insert(String::from("Test Relationship Name"), new_relationship_definition);
+        node_relationships.insert(
+            String::from("Test Relationship Name"),
+            new_relationship_definition,
+        );
 
         let mut test_db = Db {
             node_definitions: HashMap::new(),
@@ -167,7 +180,6 @@ mod tests {
 
     #[test]
     fn test_save_and_restore_db() {
-        
         let mut test_db = Db::default();
         //Adding node definitions
         let new_node_definition = NodeDefinition {
@@ -192,11 +204,16 @@ mod tests {
         test_db.save_schema_definition("./test-schema-drop.slth");
 
         let mut new_db = Db::load_schema_definition("./test-schema-drop.slth");
-        assert_eq!(test_db.node_definitions.len(), new_db.node_definitions.len(), "Did not properly store or load node definitions");
-        assert_eq!(test_db.relationship_definitions.len(), new_db.relationship_definitions.len(), "Did not properly store or load relationship definitions");
-
-
-
+        assert_eq!(
+            test_db.node_definitions.len(),
+            new_db.node_definitions.len(),
+            "Did not properly store or load node definitions"
+        );
+        assert_eq!(
+            test_db.relationship_definitions.len(),
+            new_db.relationship_definitions.len(),
+            "Did not properly store or load relationship definitions"
+        );
     }
 
 }
