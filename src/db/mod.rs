@@ -8,6 +8,9 @@ pub mod node_definition;
 use self::node_definition::NodeDefinition;
 use self::node_definition::NodeFieldDefinition;
 
+pub mod relationship_definition;
+use self::relationship_definition::*;
+
 pub mod field_type;
 use self::field_type::FieldType;
 
@@ -15,7 +18,6 @@ use self::field_type::FieldType;
 pub struct Db<'a> {
     pub node_definitions: HashMap<String, NodeDefinition>,
     pub relationship_definitions: HashMap<String, RelationshipDefinition<'a>>,
-    pub nodes: Vec<&'a NodeDefinition>, //This will be changed to a set of sets
 }
 
 impl<'a> Db<'a> {
@@ -23,7 +25,6 @@ impl<'a> Db<'a> {
         return Db {
             node_definitions: HashMap::new(),
             relationship_definitions: HashMap::new(),
-            nodes: Vec::new(),
         }
     }
 
@@ -60,32 +61,6 @@ impl<'a> Db<'a> {
     
 }
 
-#[derive(Debug)]//#[derive(Serialize, Deserialize)]
-pub enum Directionality {
-    OneWay,
-    TwoWay,
-}
-
-#[derive(Debug)]//#[derive(Serialize, Deserialize)]
-pub struct Connection<'a> {
-    pub reversible: bool,
-    pub left_type: &'a NodeDefinition,
-    pub right_type: &'a NodeDefinition,
-}
-
-#[derive(Debug)]//#[derive(Serialize, Deserialize)]
-pub struct RelationshipFieldDefinition {
-    pub name: String,
-    pub field_type: FieldType,
-}
-
-#[derive(Debug)]//#[derive(Serialize, Deserialize)]
-pub struct RelationshipDefinition<'a> {
-    pub name: String,
-    pub directionality: Directionality,
-    pub connections: Vec<Connection<'a>>,
-    pub fields: Vec<RelationshipFieldDefinition>,
-}
 
 #[cfg(test)]
 mod tests {
@@ -132,7 +107,6 @@ mod tests {
         let mut test_db = Db {
             node_definitions: node_definitions,
             relationship_definitions: HashMap::new(),
-            nodes: Vec::new(),
         };
         test_db.remove_node_definition(String::from("Test Node Name"));
         assert!(
@@ -146,7 +120,6 @@ mod tests {
         let mut test_db = Db {
             node_definitions: HashMap::new(),
             relationship_definitions: HashMap::new(),
-            nodes: Vec::new(),
         };
         let new_relationship_definition = RelationshipDefinition {
             name: String::from("Test Relationship Name"),
@@ -186,7 +159,6 @@ mod tests {
         let mut test_db = Db {
             node_definitions: HashMap::new(),
             relationship_definitions: node_relationships,
-            nodes: Vec::new(),
         };
         test_db.remove_relationship_definition(String::from("Test Relationship Name"));
         assert!(
