@@ -16,12 +16,14 @@ pub struct NodeDefinition {
     pub fields: Vec<NodeFieldDefinition>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Node {
     pub id: u64,
     pub fields: Vec<String>,
     pub relationships: Vec<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct NodeGroup {
     pub definition: NodeDefinition,
     pub current_id: u64,
