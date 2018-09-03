@@ -88,3 +88,7 @@ Utility
 how do you get a reference to a node? find/findOne
 Do they all have identifiers? yes they have a hashId
 Make initial searches not the key focus but the graph hops
+
+indices on fields are stored as b trees with pointers to their respective node (and potentially pointers to their location on disc)
+
+How to implement transactions witthout having duplicate? Make a shadow set that unions to the real data? Make's things slower I think?
