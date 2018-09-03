@@ -13,8 +13,8 @@ use self::field_type::FieldType;
 
 //#[derive(Serialize, Deserialize)]
 pub struct Db<'a> {
-    pub node_definitions: HashMap<&'a str, NodeDefinition>,
-    pub relationship_definitions: HashMap<&'a str, RelationshipDefinition<'a>>,
+    pub node_definitions: HashMap<String, NodeDefinition>,
+    pub relationship_definitions: HashMap<String, RelationshipDefinition<'a>>,
     pub nodes: Vec<&'a NodeDefinition>, //This will be changed to a set of sets
 }
 
@@ -36,18 +36,18 @@ impl<'a> Db<'a> {
     }
 
     fn add_node_definition(&mut self, new_node_definition: NodeDefinition) -> () {
-        self.node_definitions.insert(new_node_definition.name.as_str(), new_node_definition);
+        self.node_definitions.insert(new_node_definition.name.clone(), new_node_definition);
     }
 
-    fn remove_node_definition(&mut self, node_definition_name: &'a str) -> () {
+    fn remove_node_definition(&mut self, node_definition_name: String) -> () {
         self.node_definitions.remove(&node_definition_name);
     }
 
     fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition<'a>) -> () {
-        self.relationship_definitions.insert(new_relationship_definition.name.as_str(), new_relationship_definition);
+        self.relationship_definitions.insert(new_relationship_definition.name.clone(), new_relationship_definition);
     }
 
-    fn remove_relationship_definition(&mut self, relationship_definition_name: &'a str) -> () {
+    fn remove_relationship_definition(&mut self, relationship_definition_name: String) -> () {
         self.relationship_definitions.remove(&relationship_definition_name);
     }
 
@@ -127,14 +127,14 @@ mod tests {
             fields: Vec::new(),
         };
         let mut node_definitions = HashMap::new();
-        node_definitions.insert("Test Node Name", new_node_definition);
+        node_definitions.insert(String::from("Test Node Name"), new_node_definition);
 
         let mut test_db = Db {
             node_definitions: node_definitions,
             relationship_definitions: HashMap::new(),
             nodes: Vec::new(),
         };
-        test_db.remove_node_definition("Test Node Name");
+        test_db.remove_node_definition(String::from("Test Node Name"));
         assert!(
             test_db.node_definitions.len() == 0,
             "Failed to delete node definition"
@@ -181,14 +181,14 @@ mod tests {
             fields: Vec::new(),
         };
         let mut node_relationships = HashMap::new();
-        node_relationships.insert("Test Relationship Name", new_relationship_definition);
+        node_relationships.insert(String::from("Test Relationship Name"), new_relationship_definition);
 
         let mut test_db = Db {
             node_definitions: HashMap::new(),
             relationship_definitions: node_relationships,
             nodes: Vec::new(),
         };
-        test_db.remove_relationship_definition("Test Relationship Name");
+        test_db.remove_relationship_definition(String::from("Test Relationship Name"));
         assert!(
             test_db.relationship_definitions.len() == 0,
             "Failed to delete node definition"
