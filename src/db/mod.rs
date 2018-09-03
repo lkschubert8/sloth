@@ -4,15 +4,22 @@ use serde_yaml;
 
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize)]
-pub struct Db {
-    pub node_definitions: HashMap<String, NodeDefinition>,
-    pub relationship_definitions: HashMap<String, RelationshipDefinition>,
-    pub nodes: Vec<NodeDefinition>,
+pub mod node_definition;
+use self::node_definition::NodeDefinition;
+use self::node_definition::NodeFieldDefinition;
+
+pub mod field_type;
+use self::field_type::FieldType;
+
+//#[derive(Serialize, Deserialize)]
+pub struct Db<'a> {
+    pub node_definitions: HashMap<&'a str, NodeDefinition>,
+    pub relationship_definitions: HashMap<&'a str, RelationshipDefinition<'a>>,
+    pub nodes: Vec<&'a NodeDefinition>, //This will be changed to a set of sets
 }
 
-impl Db {
-    fn default () -> Db {
+impl<'a> Db<'a> {
+    fn default () -> Db<'a> {
         return Db {
             node_definitions: HashMap::new(),
             relationship_definitions: HashMap::new(),
@@ -20,83 +27,64 @@ impl Db {
         }
     }
 
-    fn load_schema_definition(filename: String) -> Db {
-        let mut file = File::open(filename.as_str()).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents);
-        return serde_yaml::from_str(contents.as_str()).unwrap();
+    fn load_schema_definition(filename: &str) -> Db {
+        unimplemented!();
+        // let mut file = File::open(filename).unwrap();
+        // let mut contents = String::new();
+        // file.read_to_string(&mut contents);
+        // return serde_yaml::from_str(contents.as_str()).unwrap();
     }
 
     fn add_node_definition(&mut self, new_node_definition: NodeDefinition) -> () {
-        self.node_definitions.insert(new_node_definition.name.clone(), new_node_definition);
+        self.node_definitions.insert(new_node_definition.name.as_str(), new_node_definition);
     }
 
-    fn remove_node_definition(&mut self, node_definition_name: String) -> () {
+    fn remove_node_definition(&mut self, node_definition_name: &'a str) -> () {
         self.node_definitions.remove(&node_definition_name);
     }
 
-    fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition) -> () {
-        self.relationship_definitions.insert(new_relationship_definition.name.clone(), new_relationship_definition);
+    fn add_relationship_definition(&mut self, new_relationship_definition: RelationshipDefinition<'a>) -> () {
+        self.relationship_definitions.insert(new_relationship_definition.name.as_str(), new_relationship_definition);
     }
 
-    fn remove_relationship_definition(&mut self, relationship_definition_name: String) -> () {
+    fn remove_relationship_definition(&mut self, relationship_definition_name: &'a str) -> () {
         self.relationship_definitions.remove(&relationship_definition_name);
     }
 
-    fn save_schema_definition(&mut self, filename: String) -> () {
-        let mut file = File::create(filename.as_str()).unwrap();
-        file.write_all(serde_yaml::to_string(&self).unwrap().as_bytes());
+    fn save_schema_definition(&mut self, filename: &str) -> () {
+        unimplemented!();
+        // let mut file = File::create(filename).unwrap();
+        // file.write_all(serde_yaml::to_string(&self).unwrap().as_bytes());
     }
 
     
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]//#[derive(Serialize, Deserialize)]
 pub enum Directionality {
     OneWay,
     TwoWay,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]//#[derive(Serialize, Deserialize)]
 pub struct Connection<'a> {
     pub reversible: bool,
     pub left_type: &'a NodeDefinition,
     pub right_type: &'a NodeDefinition,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]//#[derive(Serialize, Deserialize)]
 pub struct RelationshipFieldDefinition {
     pub name: String,
     pub field_type: FieldType,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RelationshipDefinition {
+#[derive(Debug)]//#[derive(Serialize, Deserialize)]
+pub struct RelationshipDefinition<'a> {
     pub name: String,
     pub directionality: Directionality,
-    pub connections: Vec<&Connection>,
+    pub connections: Vec<Connection<'a>>,
     pub fields: Vec<RelationshipFieldDefinition>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct NodeFieldDefinition {
-    pub name: String,
-    pub field_type: FieldType,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct NodeDefinition {
-    pub name: String,
-    pub fields: Vec<NodeFieldDefinition>,
-}
-
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum FieldType {
-    String,
-    Integer,
-    Float,
-    Boolean
 }
 
 #[cfg(test)]
@@ -106,25 +94,23 @@ mod tests {
 
     #[test]
     fn test_add_node_definition() {
-        let mut test_db = Db {
-            node_definitions: HashMap::new(),
-            relationship_definitions: HashMap::new(),
-            nodes: Vec::new(),
-        };
         let new_node_definition = NodeDefinition {
             name: String::from("Test Node Name"),
             fields: Vec::new(),
         };
+        let new_node_definition2 = NodeDefinition {
+            name: String::from("Test Node Name"),
+            fields: Vec::new(),
+        };
+        let mut test_db = Db::default();
+
         test_db.add_node_definition(new_node_definition);
         assert!(
             test_db.node_definitions.len() == 1,
             "Failed to add node definition"
         );
 
-        let new_node_definition2 = NodeDefinition {
-            name: String::from("Test Node Name"),
-            fields: Vec::new(),
-        };
+       
         test_db.add_node_definition(new_node_definition2);
 
         assert!(
@@ -141,14 +127,14 @@ mod tests {
             fields: Vec::new(),
         };
         let mut node_definitions = HashMap::new();
-        node_definitions.insert(String::from("Test Node Name"), new_node_definition);
+        node_definitions.insert("Test Node Name", new_node_definition);
 
         let mut test_db = Db {
             node_definitions: node_definitions,
             relationship_definitions: HashMap::new(),
             nodes: Vec::new(),
         };
-        test_db.remove_node_definition(String::from("Test Node Name"));
+        test_db.remove_node_definition("Test Node Name");
         assert!(
             test_db.node_definitions.len() == 0,
             "Failed to delete node definition"
@@ -195,14 +181,14 @@ mod tests {
             fields: Vec::new(),
         };
         let mut node_relationships = HashMap::new();
-        node_relationships.insert(String::from("Test Relationship Name"), new_relationship_definition);
+        node_relationships.insert("Test Relationship Name", new_relationship_definition);
 
         let mut test_db = Db {
             node_definitions: HashMap::new(),
             relationship_definitions: node_relationships,
             nodes: Vec::new(),
         };
-        test_db.remove_relationship_definition(String::from("Test Relationship Name"));
+        test_db.remove_relationship_definition("Test Relationship Name");
         assert!(
             test_db.relationship_definitions.len() == 0,
             "Failed to delete node definition"
@@ -225,24 +211,17 @@ mod tests {
         test_db.add_node_definition(new_node_definition);
         test_db.add_node_definition(new_node_definition2);
 
-        //Adding relationship definitions
-        let p2p_connection = Connection {
-            reversible: true,
-            left_type: &new_node_definition,
-            right_type: &new_node_definition2,
-        };
-
         let relation = RelationshipDefinition {
-            connections: vec![p2p_connection],
+            connections: Vec::new(),
             name: String::from("Friend"),
             directionality: Directionality::OneWay,
             fields: Vec::new(),
         };
         test_db.add_relationship_definition(relation);
 
-        test_db.save_schema_definition(String::from("./test-schema-drop.slth"));
+        test_db.save_schema_definition("./test-schema-drop.slth");
 
-        let mut new_db = Db::load_schema_definition(String::from("./test-schema-drop.slth"));
+        let mut new_db = Db::load_schema_definition("./test-schema-drop.slth");
         assert_eq!(test_db.node_definitions.len(), new_db.node_definitions.len(), "Did not properly store or load node definitions");
         assert_eq!(test_db.relationship_definitions.len(), new_db.relationship_definitions.len(), "Did not properly store or load relationship definitions");
 
