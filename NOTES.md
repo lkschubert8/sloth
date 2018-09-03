@@ -86,7 +86,7 @@ Utility
 
 
 how do you get a reference to a node? find/findOne
-Do they all have identifiers? yes they have a hashId
+Do they all have identifiers? yes they have some form of id (maybe a guid?)
 Make initial searches not the key focus but the graph hops
 
 indices on fields are stored as b trees with pointers to their respective node (and potentially pointers to their location on disc)
