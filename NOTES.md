@@ -1,3 +1,35 @@
+My current understanding of how this will work as of 9/4/2018
+A database will be a list of NodeSets
+A nodeset will contain one node definition, a set of nodes, a set of index trees for searching the nodes, a set 
+of relationships
+
+DataStructures
++-------------+
+|Db           |
++-------------+
+|List<NodeSet>|
++-------------+
+
++----------------------------+
+|NodeSet                     |
++----------------------------+
+|NodeDefinition              |
+|List<Node>                  |
+|List<RelationshipDefinition>|
+|Map<IndexTrees>             |
++----------------------------+
+
++--------------+
+|NodeDefinition|
++--------------+
+|NodeName      |
+|List<Fields>  |
++--------------+
+
++--------------+
+|Node          |
++--------------+
+
 A graph db (for now)
 
 Relations
@@ -92,3 +124,8 @@ Make initial searches not the key focus but the graph hops
 indices on fields are stored as b trees with pointers to their respective node (and potentially pointers to their location on disc)
 
 How to implement transactions witthout having duplicate? Make a shadow set that unions to the real data? Make's things slower I think?
+
+how to implement other constraints on data (unique, comparisons)
+how to implement computed fields
+
+
