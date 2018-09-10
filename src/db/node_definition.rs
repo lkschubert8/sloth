@@ -85,7 +85,7 @@ mod tests {
         );
     }
 
-        //Helper functions
+    //Helper functions
     fn create_node_definition() -> NodeDefinition {
         let field = FieldDefinition {
             field: FieldDefinitionType::String,
