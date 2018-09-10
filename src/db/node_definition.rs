@@ -61,6 +61,10 @@ impl NodeDefinition {
         self.current_id += 1;
         return Ok(current_id);
     }
+
+    pub fn remove_node(&mut self, id: u64){
+        self.nodes.remove(&id);
+    }
 }
 
 #[cfg(test)]
@@ -69,11 +73,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add_remove_node_definition() {
+    fn test_add_remove_node() {
         let mut node_definition = create_node_definition();
 
-        node_definition.add_node(Vec::new());
+        let node_result = node_definition.add_node(Vec::new());
         
+        match node_result {
+            Ok(val) => assert!(val == 0, "Didn't return the correct new id"),
+            Err(err) => panic!("Didn't successfully insert node"),
+        };
+
         assert!(
             node_definition.nodes.len() == 1,
             "Failed to insert node"
@@ -83,6 +92,12 @@ mod tests {
             node_definition.current_id == 1,
             "Failed to increment current id"
         );
+
+        node_definition.remove_node(0);
+        assert!(
+            node_definition.nodes.len() == 0,
+            "Failed to remove node"
+        )
     }
 
     //Helper functions
