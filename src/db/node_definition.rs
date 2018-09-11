@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub enum FieldDefinitionType {
@@ -62,8 +62,12 @@ impl NodeDefinition {
         return Ok(current_id);
     }
 
-    pub fn remove_node(&mut self, id: u64){
+    pub fn remove_node(&mut self, id: u64) {
         self.nodes.remove(&id);
+    }
+
+    pub fn find_node(&mut self, id: u64) -> Option<&Node> {
+        self.nodes.get(&id)
     }
 }
 
@@ -77,16 +81,13 @@ mod tests {
         let mut node_definition = create_node_definition();
 
         let node_result = node_definition.add_node(Vec::new());
-        
+
         match node_result {
             Ok(val) => assert!(val == 0, "Didn't return the correct new id"),
             Err(err) => panic!("Didn't successfully insert node"),
         };
 
-        assert!(
-            node_definition.nodes.len() == 1,
-            "Failed to insert node"
-        );
+        assert!(node_definition.nodes.len() == 1, "Failed to insert node");
 
         assert!(
             node_definition.current_id == 1,
@@ -94,10 +95,29 @@ mod tests {
         );
 
         node_definition.remove_node(0);
-        assert!(
-            node_definition.nodes.len() == 0,
-            "Failed to remove node"
-        )
+        assert!(node_definition.nodes.len() == 0, "Failed to remove node")
+    }
+
+    #[test]
+    fn find_node() {
+        let mut node_definition = create_node_definition();
+
+        let node_result = node_definition.add_node(Vec::new());
+        let node_result = node_definition.add_node(Vec::new());
+        {
+            let should_be_found = node_definition.find_node(0);
+            assert!(
+                should_be_found.is_some(),
+                "Could not find id 0 which has been inserted"
+            );
+        }
+        {
+            let shouldnt_be_found = node_definition.find_node(4);
+            assert!(
+                shouldnt_be_found.is_none(),
+                "Somehow found id 4 which has not been inserted"
+            );
+        }
     }
 
     //Helper functions
