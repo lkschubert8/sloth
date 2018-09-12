@@ -18,15 +18,10 @@ pub struct FieldDefinition {
 #[derive(Debug)]
 pub struct Node {
     id: u64,
-    fields: HashMap<String, Field>,
+    fields: HashMap<String, FieldValue>,
 }
 
-#[derive(Debug)]
-pub struct Field {
-    pub value: FieldValue,
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FieldValue {
     String(String),
     Int(i64),
@@ -49,8 +44,34 @@ pub struct NodeDefinition {
 }
 
 impl NodeDefinition {
+    //Initially creating a node will require all of the fields specified in that
+    //node definition. I will probably move towards SQL-esque constraints on
+    //fields at some point, but that's a problem for future me.
     pub fn add_node(&mut self, values: Vec<InsertField>) -> Result<u64, String> {
-        let fields = HashMap::new();
+        let values_length = values.len();
+        let definition_length = self.fields.len();
+        if values_length != definition_length {
+            return Err(format!(
+                "Expected {} fields, received {}",
+                definition_length, values_length
+            ));
+        }
+
+        let mut fields = HashMap::new();
+
+        for field in self.fields.iter() {
+            let insert_field = values.iter().find(move |x| x.name == field.name);
+            if insert_field.is_none() {
+                return Err(format!(
+                    "Couldn't find field {} in the insert set",
+                    field.name
+                ));
+            } else {
+                let insert_field = insert_field.unwrap();
+                //Todo check that types match
+                fields.insert(insert_field.name.clone(), insert_field.value.clone());
+            }
+        }
 
         let current_id = self.current_id;
         let node = Node {
@@ -69,6 +90,14 @@ impl NodeDefinition {
     pub fn find_node(&mut self, id: u64) -> Option<&Node> {
         self.nodes.get(&id)
     }
+
+    pub fn get_schema(&self) {
+        unimplemented!();
+    }
+
+    pub fn update_node(&self, id: u64, values: Vec<InsertField>) {
+        unimplemented!();
+    }
 }
 
 #[cfg(test)]
@@ -80,11 +109,14 @@ mod tests {
     fn test_add_remove_node() {
         let mut node_definition = create_node_definition();
 
-        let node_result = node_definition.add_node(Vec::new());
+        let node_result = node_definition.add_node(vec![InsertField {
+            value: FieldValue::String(String::from("Luke Schubert")),
+            name: String::from("Name"),
+        }]);
 
         match node_result {
             Ok(val) => assert!(val == 0, "Didn't return the correct new id"),
-            Err(err) => panic!("Didn't successfully insert node"),
+            Err(err) => panic!("Didn't successfully insert node, {}", err),
         };
 
         assert!(node_definition.nodes.len() == 1, "Failed to insert node");
@@ -102,8 +134,14 @@ mod tests {
     fn find_node() {
         let mut node_definition = create_node_definition();
 
-        let node_result = node_definition.add_node(Vec::new());
-        let node_result = node_definition.add_node(Vec::new());
+        let _node_result_a = node_definition.add_node(vec![InsertField {
+            value: FieldValue::String(String::from("Luke Schubert")),
+            name: String::from("Name"),
+        }]);
+        let _node_result_b = node_definition.add_node(vec![InsertField {
+            value: FieldValue::String(String::from("Aries Matheos")),
+            name: String::from("Name"),
+        }]);
         {
             let should_be_found = node_definition.find_node(0);
             assert!(
