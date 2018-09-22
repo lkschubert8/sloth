@@ -25,7 +25,8 @@ impl Db {
     }
 
     fn add_node_definition(&mut self, new_node_definition: NodeDefinition) -> () {
-        self.node_set.insert(new_node_definition.name.clone(), new_node_definition);
+        self.node_set
+            .insert(new_node_definition.name.clone(), new_node_definition);
     }
 
     fn remove_node_definition(&mut self, node_definition_name: String) -> () {
@@ -70,17 +71,11 @@ mod tests {
 
         db.add_node_definition(new_node_definition);
 
-        assert!(
-            db.node_set.len() == 1,
-            "Failed to insert node definition"
-        );
+        assert!(db.node_set.len() == 1, "Failed to insert node definition");
 
         db.remove_node_definition(String::from("Person"));
 
-        assert!(
-            db.node_set.len() == 0,
-            "Failed to remove node definition"
-        )
+        assert!(db.node_set.len() == 0, "Failed to remove node definition")
     }
 
     // #[test]
